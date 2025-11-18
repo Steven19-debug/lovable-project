@@ -1,0 +1,37 @@
+name: Build Android
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Type de build: APK ou AAB'
+        required: true
+        default: 'APK'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: |
+          if [ "${{ github.event.inputs.build_type }}" == "APK" ]; then
+            npx eas build --platform android --profile preview --non-interactive
+          else
+            npx eas build --platform android --profile production --non-interactive
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.event.inputs.build_type }}
+          path: ./dist/**/*.apk # ou .aab selon le build
