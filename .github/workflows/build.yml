@@ -11,16 +11,23 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
 
-      - name: Setup Node
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
       - name: Install dependencies
         run: npm install
+
+      - name: Configure Expo
+        run: npx expo login --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build project
         run: |
@@ -34,4 +41,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.inputs.build_type }}
-          path: ./dist/**/*.apk # ou .aab selon le build
+          path: |
+            # Pour Expo managed project, les builds EAS sont récupérés automatiquement
+            # Ici on suppose que le fichier APK/AAB est dans le dossier dist/
+            dist/**/*.apk
+            dist/**/*.aab
