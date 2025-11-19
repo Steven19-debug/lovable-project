@@ -4,48 +4,33 @@ on:
   workflow_dispatch:
     inputs:
       build_type:
-        description: "Type de build: APK ou AAB"
+        description: "Type de build (apk ou aab)"
         required: true
-        default: "APK"
+        default: "apk"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Cloner le repo
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      # 2️⃣ Installer Node
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Install Node
+        uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      # 3️⃣ Installer dépendances
-      - name: Install dependencies
+      - name: Install deps
         run: npm install
 
-      # 4️⃣ Installer EAS CLI
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
-
-      # 5️⃣ Login Expo via token (correct)
-      - name: Expo Login
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas login --non-interactive
-
-      # 6️⃣ Build Android
-      - name: Start EAS Build
+      - name: Build APK/AAB
         run: |
-          if [ "${{ github.event.inputs.build_type }}" = "APK" ]; then
-            eas build --platform android --profile preview --non-interactive
-          else
-            eas build --platform android --profile production --non-interactive
-          fi
+          npm install -g eas-cli
+          eas build --platform android --profile production --non-interactive
 
-      # 7️⃣ Voir l’URL du build
-      - name: Get Build URL
-        run: eas build:list --limit 1
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-${{ github.event.inputs.build_type }}
+          path: build-output/*
