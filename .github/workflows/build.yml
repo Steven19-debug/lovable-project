@@ -13,36 +13,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Récupérer le code
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2️⃣ Installer Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
+      # 3️⃣ Installer les dépendances npm
       - name: Install dependencies
         run: npm install
 
+      # 4️⃣ Configurer Expo avec ton token sécurisé
       - name: Configure Expo
-        run: npx expo login --non-interactive
+        run: npx eas login --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Build project
+      # 5️⃣ Build Android selon le type choisi
+      - name: Build Android
         run: |
           if [ "${{ github.event.inputs.build_type }}" == "APK" ]; then
+            echo "Building APK..."
             npx eas build --platform android --profile preview --non-interactive
           else
+            echo "Building AAB..."
             npx eas build --platform android --profile production --non-interactive
           fi
 
+      # 6️⃣ Télécharger l’artifact généré (APK ou AAB)
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.event.inputs.build_type }}
           path: |
-            # Pour Expo managed project, les builds EAS sont récupérés automatiquement
-            # Ici on suppose que le fichier APK/AAB est dans le dossier dist/
-            dist/**/*.apk
-            dist/**/*.aab
+            # EAS build télécharge automatiquement le fichier APK/AAB dans le dossier result/
+            # Mettre le chemin exact selon ton projet
+            ./dist/**/*.apk
+            ./dist/**/*.aab
