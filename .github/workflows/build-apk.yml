@@ -1,31 +1,31 @@
-name: Build Android APK
+name: Build Android Debug APK
 
 on:
   workflow_dispatch:
 
 jobs:
-  build-android:
+  build-android-debug:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout
+      # 1️⃣ Récupérer le code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Installer Node.js 20
+      # 2️⃣ Installer Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # 3️⃣ Installer Java 17
-      - name: Setup Java
+      # 3️⃣ Installer Java 21
+      - name: Setup Java 21
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: 17
+          distribution: temurin
+          java-version: 21
 
-      # 4️⃣ Installer dépendances NPM
+      # 4️⃣ Installer dépendances npm
       - name: Install dependencies
         run: npm install
 
@@ -33,11 +33,11 @@ jobs:
       - name: Install Capacitor CLI
         run: npm install -g @capacitor/cli
 
-      # 6️⃣ Supprimer ancien dossier Android
+      # 6️⃣ Supprimer le dossier Android existant pour repartir propre
       - name: Remove old android folder
         run: rm -rf android
 
-      # 7️⃣ Build Vite (dist/)
+      # 7️⃣ Build le projet Vite
       - name: Build Vite project
         run: npm run build
 
@@ -49,19 +49,19 @@ jobs:
       - name: Add Android platform
         run: npx cap add android
 
-      # 🔟 Synchroniser Capacitor Android
+      # 🔟 Synchroniser Capacitor
       - name: Sync Capacitor Android
         run: npx cap sync android
 
       # 1️⃣1️⃣ Build APK Debug
-      - name: Build APK
+      - name: Build Debug APK
         run: |
           cd android
           ./gradlew assembleDebug
 
-      # 1️⃣2️⃣ Upload APK avec le nom souhaité
-      - name: Upload APK
+      # 1️⃣2️⃣ Upload APK Debug généré
+      - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: Donation.apk
+          name: app-debug.apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
