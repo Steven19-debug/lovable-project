@@ -1,27 +1,67 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
 jobs:
   build-android:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Récupérer le code
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2️⃣ Installer Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
+      # 3️⃣ Installer Java 17 pour Android
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 17
 
+      # 4️⃣ Installer les dépendances NPM
       - name: Install dependencies
         run: npm install
 
+      # 5️⃣ Installer Capacitor CLI globalement
       - name: Install Capacitor CLI
         run: npm install -g @capacitor/cli
 
+      # 6️⃣ Supprimer ancien dossier Android s'il existe
+      - name: Remove old android folder
+        run: rm -rf android
+
+      # 7️⃣ Build Vite (génère dist/)
       - name: Build Vite project
         run: npm run build
+
+      # 8️⃣ Installer Capacitor Android
+      - name: Install Capacitor Android
+        run: npm install @capacitor/android
+
+      # 9️⃣ Ajouter la plateforme Android
+      - name: Add Android platform
+        run: npx cap add android
+
+      # 🔟 Synchroniser Capacitor Android
+      - name: Sync Capacitor Android
+        run: npx cap sync android
+
+      # 1️⃣1️⃣ Builder l’APK Debug
+      - name: Build APK
+        run: |
+          cd android
+          ./gradlew assembleDebug
+
+      # 1️⃣2️⃣ Upload l’APK avec le nom que tu veux
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Donation.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
