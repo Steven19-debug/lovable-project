@@ -8,24 +8,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Récupérer le code
+      # 1️⃣ Checkout
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Installer Node.js
+      # 2️⃣ Installer Node.js 20
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # 3️⃣ Installer Java 17 pour Gradle/Android
+      # 3️⃣ Installer Java 17
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 17
 
-      # 4️⃣ Installer les dépendances NPM
+      # 4️⃣ Installer dépendances NPM
       - name: Install dependencies
         run: npm install
 
@@ -33,11 +33,11 @@ jobs:
       - name: Install Capacitor CLI
         run: npm install -g @capacitor/cli
 
-      # 6️⃣ Supprimer ancien dossier Android si existant
+      # 6️⃣ Supprimer ancien dossier Android
       - name: Remove old android folder
         run: rm -rf android
 
-      # 7️⃣ Build Vite (génère /dist)
+      # 7️⃣ Build Vite (dist/)
       - name: Build Vite project
         run: npm run build
 
@@ -53,13 +53,13 @@ jobs:
       - name: Sync Capacitor Android
         run: npx cap sync android
 
-      # 1️⃣1️⃣ Builder l’APK Debug
+      # 1️⃣1️⃣ Build APK Debug
       - name: Build APK
         run: |
           cd android
           ./gradlew assembleDebug
 
-      # 1️⃣2️⃣ Upload APK avec le nom voulu
+      # 1️⃣2️⃣ Upload APK avec le nom souhaité
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
