@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.swift.donation',
+  appId: "com.swift.donation",
   appName: 'swift-donation-app',
   webDir: 'dist',
   server: {
