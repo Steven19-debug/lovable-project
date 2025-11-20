@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build APK
 
 on:
   workflow_dispatch:
@@ -14,27 +14,30 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20   # <-- IMPORTANT
 
       - name: Install dependencies
         run: npm install
 
-      - name: Install Capacitor Android platform
-        run: npm install @capacitor/android
+      - name: Install Capacitor CLI
+        run: npm install -g @capacitor/cli
 
       - name: Build Vite project
         run: npm run build
 
-      - name: Add Android platform if not exists
+      - name: Install Capacitor Android
+        run: npm install @capacitor/android
+
+      - name: Add Android platform
         run: |
           if [ ! -d "android" ]; then
             npx cap add android
           fi
 
-      - name: Sync Capacitor
+      - name: Sync Capacitor Android
         run: npx cap sync android
 
-      - name: Build APK (Debug)
+      - name: Build APK
         run: |
           cd android
           ./gradlew assembleDebug
@@ -44,4 +47,3 @@ jobs:
         with:
           name: Donation.apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
-
