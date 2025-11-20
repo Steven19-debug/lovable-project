@@ -1,8 +1,3 @@
-name: Build APK
-
-on:
-  workflow_dispatch:
-
 jobs:
   build-android:
     runs-on: ubuntu-latest
@@ -16,34 +11,17 @@ jobs:
         with:
           node-version: 20
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
       - name: Install dependencies
         run: npm install
 
       - name: Install Capacitor CLI
         run: npm install -g @capacitor/cli
 
-      - name: Remove old android folder
-        run: rm -rf android
-
       - name: Build Vite project
         run: npm run build
-
-      - name: Install Capacitor Android
-        run: npm install @capacitor/android
-
-      - name: Add Android platform
-        run: npx cap add android
-
-      - name: Sync Capacitor Android
-        run: npx cap sync android
-
-      - name: Build APK
-        run: |
-          cd android
-          ./gradlew assembleDebug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: Donation.apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
