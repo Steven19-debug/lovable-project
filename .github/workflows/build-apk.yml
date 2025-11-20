@@ -1,4 +1,4 @@
-name: Build APK
+name: Build Android APK
 
 on:
   workflow_dispatch:
@@ -19,19 +19,29 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install Capacitor CLI
-        run: npm install -g @capacitor/cli
+      - name: Install Capacitor Android platform
+        run: npm install @capacitor/android
 
       - name: Build Vite project
         run: npm run build
 
-      - name: Install Capacitor Android
-        run: npm install @capacitor/android
+      - name: Add Android platform if not exists
+        run: |
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
 
-      - name: Add Android platform
-        run: npx cap add android
-
-      - name: Sync Capacitor Android
+      - name: Sync Capacitor
         run: npx cap sync android
 
+      - name: Build APK (Debug)
+        run: |
+          cd android
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Donation.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
 
