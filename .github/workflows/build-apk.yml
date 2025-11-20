@@ -14,13 +14,16 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20   # <-- IMPORTANT
+          node-version: 20
 
       - name: Install dependencies
         run: npm install
 
       - name: Install Capacitor CLI
         run: npm install -g @capacitor/cli
+
+      - name: Remove old android folder
+        run: rm -rf android
 
       - name: Build Vite project
         run: npm run build
@@ -29,10 +32,7 @@ jobs:
         run: npm install @capacitor/android
 
       - name: Add Android platform
-        run: |
-          if [ ! -d "android" ]; then
-            npx cap add android
-          fi
+        run: npx cap add android
 
       - name: Sync Capacitor Android
         run: npx cap sync android
